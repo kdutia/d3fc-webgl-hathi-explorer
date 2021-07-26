@@ -83,23 +83,25 @@ const yScaleOriginal = yScale.copy();
 const pointSeries = fc
   .seriesWebglPoint()
   .equals((a, b) => a === b)
-  .size(1)
+  // point size
+  .size(3)
   .crossValue(d => d.x)
   .mainValue(d => d.y);
 
 const zoom = d3
   .zoom()
   .scaleExtent([0.8, 10])
-  .on("zoom", () => {
+  .on("zoom", (event) => {
     // update the scales based on current zoom
-    xScale.domain(d3.event.transform.rescaleX(xScaleOriginal).domain());
-    yScale.domain(d3.event.transform.rescaleY(yScaleOriginal).domain());
+    xScale.domain(event.transform.rescaleX(xScaleOriginal).domain());
+    yScale.domain(event.transform.rescaleY(yScaleOriginal).domain());
     redraw();
   });
 
 const annotations = [];
 
-const pointer = fc.pointer().on("point", ([coord]) => {
+const pointer = fc.pointer()
+.on("point", ([coord]) => {
   annotations.pop();
 
   if (!coord || !quadtree) {
@@ -115,8 +117,31 @@ const pointer = fc.pointer().on("point", ([coord]) => {
   // if the closest point is within 20 pixels, show the annotation
   if (closestDatum) {
     annotations[0] = createAnnotationData(closestDatum);
+    // document.getElementById("attributeheadertext").innerText = closestDatum.title;
+    // document.getElementById("attributetext").innerHTML = "<ul><li><em>Date: </em>" + closestDatum.date + "</li> <li><em>Language: </em>" + closestDatum.language + "</li> <li><em>Author: </em>" + closestDatum.first_author_name + "</li></ul>";
   }
 
+  redraw();
+})
+
+const clicker = fc.clicker()
+.on("click", ([coord]) => {
+  if (!coord || !quadtree) {
+    return;
+  }
+  console.log("click!")
+
+  // find the closes datapoint to the pointer
+  const x = xScale.invert(coord.x);
+  const y = yScale.invert(coord.y);
+  const radius = Math.abs(xScale.invert(coord.x) - xScale.invert(coord.x - 20));
+  const closestDatum = quadtree.find(x, y, radius);
+  // if the closest point is within 20 pixels, show the annotation
+  if (closestDatum) {
+    document.getElementById("attributeheadertext").innerText = closestDatum.title;
+    document.getElementById("attributetext").innerHTML = "<ul><li><em>Date: </em>" + closestDatum.date + "</li> <li><em>Language: </em>" + closestDatum.language + "</li> <li><em>Author: </em>" + closestDatum.first_author_name + "</li></ul>";
+  }
+  
   redraw();
 });
 
@@ -144,14 +169,15 @@ const chart = fc
     sel
       .enter()
       .select("d3fc-svg.plot-area")
-      .on("measure.range", () => {
-        xScaleOriginal.range([0, d3.event.detail.width]);
-        yScaleOriginal.range([d3.event.detail.height, 0]);
+      .on("measure.range", (event) => {
+        xScaleOriginal.range([0, event.detail.width]);
+        yScaleOriginal.range([event.detail.height, 0]);
       })
       .call(zoom)
       .call(pointer)
+      .call(clicker)
   );
-
+  
 // render the chart with the required data
 // Enqueues a redraw to occur on the next animation frame
 const redraw = () => {

@@ -5,8 +5,9 @@
     <script src="//unpkg.com/custom-event-polyfill@0.3.0/custom-event-polyfill.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/document-register-element/1.8.0/document-register-element.js"></script>
 
-    <script src="//unpkg.com/d3@5.15.0/dist/d3.min.js"></script>
-    <script src="//unpkg.com/d3fc@14.2.3/build/d3fc.js"></script>
+    <script src="//unpkg.com/d3@6.7.0//dist/d3.min.js"></script>
+    <!-- <script src="//unpkg.com/d3fc@14.2.3/build/d3fc.js"></script> -->
+    <script src="./d3fc/packages/d3fc/build/d3fc.js"></script>
     <script src="//unpkg.com/d3-svg-annotation@2.5.1/indexRollup.js"></script>
     <style>
       .annotation-note-bg {
@@ -94,6 +95,38 @@
       a:hover {
         text-decoration: underline;
       }
+
+      #attributepane {
+        display: block;	
+        position:absolute;
+        max-height:300px;
+        bottom:0;
+        top:70px;
+        left:20px;
+        width: 240px;
+        margin: 0;
+        word-wrap: break-word;
+        background-color:rgba(248, 248, 248, 0.8);
+        /* border-left: 1px solid #ccc; */
+        padding: 0px 18px 0px 18px;	
+        z-index: 1;
+      }
+      #attributepane #attributetext {
+        height:100%;
+      }
+
+      #attributepane #attributeheadertext {
+        color: #000;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 5px;
+        height:80px;
+        border-bottom: 1px dashed #999;
+        padding: 20px 0 10px 0;
+        font-size:16px;
+        font-weight:bold;
+      }
+
     </style>
   </head>
   <body>
@@ -116,6 +149,11 @@
       <div id="loading"><span>loading...</span></div>
     </div>
 
+    <div id="attributepane">
+      <div id="attributeheadertext"></div>
+      <div id="attributetext"></div>
+    </div>
+    
     <script src="index.js" type="module"></script>
   </body>
 </html>
