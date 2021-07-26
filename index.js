@@ -12,9 +12,9 @@ let quadtree;
 
 const createAnnotationData = datapoint => ({
   note: {
-    label: datapoint.first_author_name + " " + datapoint.year,
+    label: datapoint.collection_category,
     bgPadding: 5,
-    title: trunc(datapoint.title, 100)
+    title: trunc(datapoint.label, 100)
   },
   x: datapoint.x,
   y: datapoint.y,
@@ -32,20 +32,20 @@ streamingLoaderWorker.onmessage = ({
       ...d,
       x: Number(d.x),
       y: Number(d.y),
-      year: Number(d.date)
+      // year: Number(d.date)
     }))
-    .filter(d => d.year);
+    .filter(d => d.label);
   data = data.concat(rows);
 
   if (finished) {
     document.getElementById("loading").style.display = "none";
 
     // compute the fill color for each datapoint
-    const languageFill = d =>
-      webglColor(languageColorScale(hashCode(d.language) % 10));
+    const typeFill = d =>
+      webglColor(typeColorScale(hashCode(d.type) % 10));
     const yearFill = d => webglColor(yearColorScale(d.year));
 
-    const fillColor = fc.webglFillColor().value(languageFill).data(data);
+    const fillColor = fc.webglFillColor().value(typeFill).data(data);
     pointSeries.decorate(program => fillColor(program));
 
     // wire up the fill color selector
@@ -53,7 +53,7 @@ streamingLoaderWorker.onmessage = ({
       el.addEventListener("click", () => {
         iterateElements(".controls a", el2 => el2.classList.remove("active"));
         el.classList.add("active");
-        fillColor.value(el.id === "language" ? languageFill : yearFill);
+        fillColor.value(el.id === "type" ? typeFill : yearFill);
         redraw();
       });
     });
@@ -70,7 +70,7 @@ streamingLoaderWorker.onmessage = ({
 };
 streamingLoaderWorker.postMessage("data.tsv");
 
-const languageColorScale = d3.scaleOrdinal(d3.schemeCategory10);
+const typeColorScale = d3.scaleOrdinal(d3.schemeCategory10);
 const yearColorScale = d3
   .scaleSequential()
   .domain([1850, 2000])
@@ -84,13 +84,13 @@ const pointSeries = fc
   .seriesWebglPoint()
   .equals((a, b) => a === b)
   // point size
-  .size(3)
+  .size(8)
   .crossValue(d => d.x)
   .mainValue(d => d.y);
 
 const zoom = d3
   .zoom()
-  .scaleExtent([0.8, 10])
+  .scaleExtent([0.8, 100])
   .on("zoom", (event) => {
     // update the scales based on current zoom
     xScale.domain(event.transform.rescaleX(xScaleOriginal).domain());
@@ -138,8 +138,8 @@ const clicker = fc.clicker()
   const closestDatum = quadtree.find(x, y, radius);
   // if the closest point is within 20 pixels, show the annotation
   if (closestDatum) {
-    document.getElementById("attributeheadertext").innerText = closestDatum.title;
-    document.getElementById("attributetext").innerHTML = "<ul><li><em>Date: </em>" + closestDatum.date + "</li> <li><em>Language: </em>" + closestDatum.language + "</li> <li><em>Author: </em>" + closestDatum.first_author_name + "</li></ul>";
+    document.getElementById("attributeheadertext").innerHTML = "<a href='" + closestDatum.id + "' target='_blank'>" + closestDatum.label + "</a>";
+    document.getElementById("attributetext").innerHTML = "<ul><li><em>Category: </em>" + closestDatum.collection_category + "</li></ul>";
   }
   
   redraw();
