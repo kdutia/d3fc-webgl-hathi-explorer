@@ -68,7 +68,7 @@ streamingLoaderWorker.onmessage = ({
 
   redraw();
 };
-streamingLoaderWorker.postMessage("data.tsv");
+streamingLoaderWorker.postMessage("visualisation_data_n_neighbours_10.tsv");
 
 const typeColorScale = d3.scaleOrdinal(d3.schemeCategory10);
 const yearColorScale = d3
