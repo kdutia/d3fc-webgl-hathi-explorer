@@ -1,5 +1,5 @@
-# hathi-explorer
+# Science Museum Group visualisation
 
-A re-implementation of Ben Schmidt's [Deep Scatter Plot](http://creatingdata.us/techne/deep_scatterplots/) of Hathi Trust library books clustered using [T-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding).
+An early version of a visualisation of knowledge graph embeddings created for the Heritage Connector project. This now lives at [heritage-connector-demos](https://github.com/TheScienceMuseum/heritage-connector-demos).
 
 This implementation uses D3FC's WebGL Series.
